@@ -7,6 +7,7 @@ preferences_VPN_disconnected.png
 preferences_VPN_connected.png
 [lib]
 [file]
+checkIP.lua
 TSLib.lua
 remove_block.lua
 getVcode.lua
@@ -23,3 +24,6 @@ getVcode.lua
 
 
 remove_block.lua
+
+getAiLeZanToken.lua
+getMobile.lua

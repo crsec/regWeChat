@@ -1,8 +1,14 @@
 require("TSLib");
 require("baseMethods");
+require("getAiLeZanToken");
+require("getMobile");
+
 require("getMobileAndToken");
 require("getVcode");
 require("remove_block");
+
+toast('kaishia啦',10)
+mSleep(3000)
 
 init("0", 0);																--初始化；
 luaExitIfCall(true);														--设置来电时退出运行脚本
@@ -26,11 +32,16 @@ click_point(353, 300,2000)--点击进入选择地区列表；
 
 click_point(624, 912,2000)--点击M定位到中国地区；
 
---move_to(353,960,353,347,10)--向上滑动使中国地区出现;
---mSleep(3000);
 click_point(353, 915,2000)--点击M定位到中国地区
 
-nLog('选定了中国区域，获取手机号。。。')
+
+aiLeZanToken = getAiLeZanToken();
+nLog('获取到爱乐赞的token为：' .. aiLeZanToken);
+mSleep(2000);
+phone = getMobile(aiLeZanToken);
+nLog('获取到爱乐赞的手机号为：' .. phone);
+
+
 
 mobileNo = '18376569152';
 click_point(330,390,1000); --获取手机号输入框焦点
@@ -55,6 +66,7 @@ aimx1,aimx2 = main();
 mSleep(4000)
 move_to(135,610,aimx1 + 45,610,10)
 nLog(9999999)
+
 
 
 
