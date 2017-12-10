@@ -1,3 +1,24 @@
+
+
+--截取全屏图片  开发时使用
+function short_all_screen(imgName,quality)
+	local w,h = getScreenSize();
+	keepScreen(true);
+	snapshot(imgName, 0, 0, w-1, h-1, quality or 90); 
+	keepScreen(false);
+end 
+--截取指定区域的图片  开发时使用
+function short_point_area_screen(imgName,x1,y1,x2,y2,quality)
+	keepScreen(true);
+	snapshot(imgName, x1, y1, x2, y2, quality or 90); 
+	keepScreen(false);
+end
+
+
+
+
+
+
 --解锁手机
 function unlock_phone()
 	if deviceIsLock()~=0 then
@@ -12,15 +33,21 @@ function press_home()
 	mSleep(1000);
 end
 
---获取设备宽高函数
-function get_device_size()
-	return getScreenSize();
+--运行APP函数
+function run_app(bid,sleep_time)
+	local flag = appIsRunning(bid); --检测APP是否在运行
+	if flag  == 1 then              --如果在运行就先关闭
+		closeApp(bid);
+		mSleep(1000)
+	end
+	runApp(bid);
+	mSleep(sleep_time or 1000);
 end
 
---*****************点击指定坐标函数
+--点击指定坐标函数
 function click_point(x,y,sleep_time)
 	touchDown(x, y);
-	mSleep(100);
+	mSleep(67);
 	touchUp(x, y);
 	mSleep(sleep_time or 2000);
 	
@@ -31,6 +58,7 @@ function move_to(x1,y1,x2,y2,step)
 	moveTo(x1,y1,x2,y2,step)
 end
 
+
 --打开/关闭VPN函数模块，依赖已截取的四张图片
 --preferences_VPN_connected.png --VPN开关已打开时的截图
 --preferences_VPN_disconnected.png --VPN开关未打开时的截图
@@ -39,21 +67,27 @@ end
 function open_VPN()
 	runApp("com.apple.Preferences");--启动“设置”
 	mSleep(2000);
-	
+
+	toast('first open VPN');
 	local deviceX,deviceY = getScreenSize();
 	local x, y = findImage("preferences_VPN_disconnected.png", 0, 0, deviceX, deviceY);
+	toast('关闭状态：' .. x .. '|' .. y,1)
 	if (x ~= -1 and y ~= -1) then
+		toast('找到vpn关闭状态按钮',1);
 		while (true) do
 			VPN_connected = false;
-			touchDown(4, 650, y+20);
+			toast('点击打开开关',1)
+			touchDown(560, y+20);
 			mSleep(67);
-			touchUp(4, 650, y+20);
+			touchUp(560, y+16);
 			mSleep(5000);
 			for num = 1, 300 do
 				x1, y1 = findImage("VPN_connection_failed.png", 0, 0, deviceX, deviceY);
 				if (x1 ~= -1 and y1 ~= -1) then
+					toast('vpn链接失败提示',1)
 					x2, y2 = findImage("VPN_connection_failed_OK_button.png", 0, 0, deviceX, deviceY); 
 					if (x2 ~= -1 and y2 ~= -1) then
+						toast('点击失败按钮，again',1)
 						touchDown(6, x2+20, y2+15);
 						mSleep(67);
 						touchUp(6, x2+20, y2+15);
@@ -63,6 +97,7 @@ function open_VPN()
 				end
 				x1, y1 = findImage("preferences_VPN_connected.png", 0, 0, deviceX, deviceY);
 				if (x1 ~= -1 and y1 ~= -1) then
+					toast('vpn链接成功',1)
 					VPN_connected = true;
 					break;
 				end
@@ -77,18 +112,100 @@ function open_VPN()
 end
 
 function close_VPN()
-	runApp("NZT");--启动“设置”
+	--runApp("NZT");--启动“设置”
+	runApp("com.apple.Preferences");--启动“设置”
 	mSleep(2000);
 	
 	local deviceX,deviceY = getScreenSize();
 	local x, y = findImage("preferences_VPN_connected.png", 0, 0, deviceX, deviceY);
+	toast('开启状态：' .. x .. '|' .. y,1)
 	if (x ~= -1 and y ~= -1 ) then
-		touchDown(4, 650, y+20);
+		toast('找到vpn打开状态按钮',1)
+		touchDown(560, y+16);
 		mSleep(67);
-		touchUp(4, 650, y+20);
+		touchUp(560, y+16);
 		mSleep(1000);
 	end
 end
+
+
+function open_new_VPN()
+	run_app("com.apple.Preferences");--启动“设置”
+	mSleep(2000)
+		
+	touchDown(320, 590); --进入VPN地址
+	mSleep(67);
+	touchUp(320, 590);
+	mSleep(2000)
+	
+	toast('first open VPN');
+	local deviceX,deviceY = getScreenSize();
+	
+	local x, y = findImage("VPN_disconnected_Btn.png", 0, 0, deviceX, deviceY);
+	toast('关闭状态：' .. x .. '|' .. y,1)
+	if (x ~= -1 and y ~= -1) then
+		toast('找到vpn关闭状态按钮',1);
+		while (true) do
+			VPN_connected = false;
+			toast('点击打开开关',1)
+			touchDown(560, y+25);
+			mSleep(67);
+			touchUp(560, y+15);
+			mSleep(5000);
+			for num = 1, 300 do
+				x1, y1 = findImage("VPN_connection_failed.png", 0, 0, deviceX, deviceY);
+				if (x1 ~= -1 and y1 ~= -1) then
+					toast('vpn链接失败提示',1)
+					x2, y2 = findImage("VPN_connection_failed_OK_button.png", 0, 0, deviceX, deviceY); 
+					if (x2 ~= -1 and y2 ~= -1) then
+						toast('点击失败按钮，again',1)
+						touchDown(6, x2+20, y2+15);
+						mSleep(67);
+						touchUp(6, x2+20, y2+15);
+						mSleep(500);
+						break;
+					end
+				end
+				x1, y1 = findImage("VPN_disconnected_Btn.png", 0, 0, deviceX, deviceY);
+				if (x1 ~= -1 and y1 ~= -1) then
+					toast('vpn链接成功',1)
+					VPN_connected = true;
+					break;
+				end
+			end
+			if (VPN_connected == true) then
+				break;
+			else
+				mSleep(1000);
+			end
+		end
+	end
+end
+
+function close_new_VPN()
+	--runApp("NZT");--启动“设置”
+	run_app("com.apple.Preferences");--启动“设置”
+	mSleep(2000);
+	
+	touchDown(320, 590); --进入VPN地址
+	mSleep(67);
+	touchUp(320, 590);
+	mSleep(2000)
+	
+	local deviceX,deviceY = getScreenSize();
+	short_point_area_screen("VPN_connected_Btn.png",500,260,610,310)
+	local x, y = findImage("VPN_connected_Btn.png", 0, 0, deviceX, deviceY);
+	toast('开启状态：' .. x .. '|' .. y,1)
+	if (x ~= -1 and y ~= -1 ) then
+		toast('找到vpn打开状态按钮',1)
+		touchDown(560, y+25);
+		mSleep(67);
+		touchUp(560, y+25);
+		mSleep(1000);
+	end
+end
+
+
 
 --输出日志并启动运行lua程序
 function log_and_restart(message)
@@ -112,16 +229,7 @@ function log_and_exit(message)
 	lua_exit();
 end
 
---运行APP函数
-function run_app(bid,sleep_time)
-	local flag = appIsRunning(bid); --检测APP是否在运行
-	if flag  == 1 then              --如果在运行就先关闭
-		closeApp(bid);
-		mSleep(1000)
-	end
-	runApp(bid);
-	mSleep(sleep_time or 1000);
-end
+
 
 --退出APP函数
 function close_app(bid,sleep_time)
@@ -129,15 +237,27 @@ function close_app(bid,sleep_time)
 	mSleep(sleep_time or 50);
 end
 
---***************运行NZT一键新机并退回主屏幕
+--运行NZT一键新机并退回主屏幕
 function to_reset_phone()
 	runApp("NZT");				--运行NZT
 	wLog(logFileName, os.date("%Y-%m-%d %H:%M:%S") .. " "  .. "启动一键新机重置手机");
 	mSleep(3000);				--等待NZT启动完成
-	touchDown(6, 488, 822);		--点击一键新机；
+	
+	touchDown(6, 146, 690);		--点击清除keyChain；
 	mSleep(67);
-	touchUp(6, 488, 822);
-	mSleep(8000);				--等待一键新机完成
+	touchUp(6, 146, 690);
+	mSleep(3000);				--等待清除keyChain；
+	
+	touchDown(6, 490, 690);		--点击清理Safari
+	mSleep(67);
+	touchUp(6, 490, 690);
+	mSleep(3000);				--等待清理Safari
+	
+	touchDown(6, 490, 822);		--点击一键新机；
+	mSleep(67);
+	touchUp(6, 490, 822);
+	mSleep(3000);				--等待一键新机完成
+	
 	pressHomeKey(0);			--按Home键，回到主屏幕；
 	pressHomeKey(1);
 	mSleep(1000);
@@ -187,42 +307,6 @@ function find_image(imageName,count,callBack)
 	end
 	
 end
-
---获取手机号码
-function get_mobile_number(token, sid)	
-	local sz = require("sz");
-    local http = require("szocket.http");
-	local url = "http://api.hellotrue.com/api/do.php?";
-	--url = url .. "action=getPhone" .. "&sid=" .. sid .. "&token=" .. token;
-	
-	local curr_mobileNo = '1';
-    local random = math.random(1, 5);
-    curr_mobileNo = curr_mobileNo .. string.sub('34578', random, random);    
-	for i = 1, 9 do
-        local random = math.random(1, 10);
-        curr_mobileNo = curr_mobileNo .. string.sub('0123456789', random, random);
-    end
-	
---	for num = 1, 10 do
---		local res, code = http.request(url);
---		code = 200;
---		if (code == 200) then
---			local resultArr = string.split(res, "|");
---	        if(resultArr[1] == "1") then
---		        curr_mobileNo = resultArr[2];
---		        break;			
---	        end
---			curr_mobileNo = '18372649152';
---		end
---		mSleep(3000);
---    end
-	return curr_mobileNo;
-end
-
-
-
-
-
 
 
 

@@ -348,31 +348,27 @@ function PrintTable(table , level)
 end
 -- 以上是封装好的函数，以下是例子
 
-function main()
-        nLog("脚本开始")
-        mSleep(2000)
+function get_moveblock_position()
+        toast("滑块脚本开始",1)
+        mSleep(1000)
         info={
-                rect = {30, 232, 610, 563};             -- 整个验证码的区域
-                piece_side = 90;                        -- 碎片方块边长
-                piece_start_rect = {60, 240, 105, 490}; -- 碎片方块查找区域
+            rect = {30, 232, 610, 563};             -- 整个验证码的区域
+            piece_side = 90;                        -- 碎片方块边长
+            piece_start_rect = {60, 240, 105, 490}; -- 碎片方块查找区域
         }
-
         local ps = find_piece_slot(info)
         if type(ps)=="table" then
-                PrintTable(ps)
-				nLog('找到了')
-				nLog(ps.slot[1])
-				nLog(ps.slot[2])
-				return ps.slot[1],ps.slot[2]
-				
-                --notifyMessage(string.format("找到坐标x=%s,y=%s",ps.slot[1],ps.slot[2]),10000);
+            PrintTable(ps)
+			toast('计算位置成功');
+			return ps.slot[1],ps.slot[2]
         else
-                nLog("错误，未知")
+            toast("查找滑块位置失败",1);
+			mSleep(3000);
+			get_moveblock_position()
         end
-
 end
 
-return main
+return get_moveblock_position
 
 
 
