@@ -1,20 +1,21 @@
 function getToken()
 	local sz = require("sz");
     local http = require("szocket.http");
-	local url = "http://api.xingjk.cn/api/do.php?action=loginIn&name=api-9ax7vsgf&password=diandianchuxing";
-	--local url = "http://api.xingjk.cn/api/do.php?action=loginIn&name=18682386798&password=diandianchuxing";
+	local url = "http://api.xingjk.cn/api/do.php?action=loginIn&name=api-9ax7vsgf&password=diandianchuxing"; --18682386798
+	--local url = "http://api.xingjk.cn/api/do.php?action=loginIn&name=cnjzlhl&password=a123456";		--cnjzlhl
 	
 	local token = nil;
 	toast('start token',1)
-	for num = 1, 10 do
+	for num = 1, 100 do
 		local res, code = http.request(url);
-		toast('获取Token中...'..'|'..code,1)
+		toast('获取Token中...',1)
 		if (code == 200) then
 			local resultArr = string.split(res, "|");
 			token = resultArr[2];
 			toast(token,1)
 			break;
 		else
+			toast(res,1)
 			mSleep(3000);
 		end
     end

@@ -4,13 +4,13 @@
 function short_all_screen(imgName,quality)
 	local w,h = getScreenSize();
 	keepScreen(true);
-	snapshot(imgName, 0, 0, w-1, h-1, quality or 90); 
+	snapshot(imgName, 0, 0, w-1, h-1); 
 	keepScreen(false);
 end 
 --截取指定区域的图片  开发时使用
 function short_point_area_screen(imgName,x1,y1,x2,y2,quality)
 	keepScreen(true);
-	snapshot(imgName, x1, y1, x2, y2, quality or 90); 
+	snapshot(imgName, x1, y1, x2, y2); 
 	keepScreen(false);
 end
 
@@ -239,24 +239,24 @@ end
 
 --运行NZT一键新机并退回主屏幕
 function to_reset_phone()
-	runApp("NZT");				--运行NZT
+	run_app("NZT");				--运行NZT
 	wLog(logFileName, os.date("%Y-%m-%d %H:%M:%S") .. " "  .. "启动一键新机重置手机");
 	mSleep(3000);				--等待NZT启动完成
 	
 	touchDown(6, 146, 690);		--点击清除keyChain；
 	mSleep(67);
 	touchUp(6, 146, 690);
-	mSleep(3000);				--等待清除keyChain；
+	mSleep(2000);				--等待清除keyChain；
 	
 	touchDown(6, 490, 690);		--点击清理Safari
 	mSleep(67);
 	touchUp(6, 490, 690);
-	mSleep(3000);				--等待清理Safari
+	mSleep(2000);				--等待清理Safari
 	
 	touchDown(6, 490, 822);		--点击一键新机；
 	mSleep(67);
 	touchUp(6, 490, 822);
-	mSleep(3000);				--等待一键新机完成
+	mSleep(2000);				--等待一键新机完成
 	
 	pressHomeKey(0);			--按Home键，回到主屏幕；
 	pressHomeKey(1);
@@ -283,6 +283,17 @@ function toggle_airModel()
 	wLog(logFileName, os.date("%Y-%m-%d %H:%M:%S") .. " "  .. "重启打开并关闭飞行模式");
 	mSleep(5000);--停顿5秒；
 	setAirplaneMode(false);--关闭飞行模式
+	
+	--检测无SIM卡
+	for var= 1, 4 do  -- 弹出无SIM卡，点击好
+		local x, y = findImage("not_have_SIM.png", 0, 0, deviceX, deviceY);
+		if (x ~= -1 and y ~= -1 ) then
+			click_point(320,625,1000); --弹出无SIM卡，点击好
+			break
+		end
+		mSleep(1000);
+	end
+	
 	mSleep(5000);
 end
 
@@ -309,19 +320,3 @@ function find_image(imageName,count,callBack)
 end
 
 
-
-
-
---截取全屏图片  开发时使用
-function short_all_screen(imgName,quality)
-	local w,h = getScreenSize();
-	keepScreen(true);
-	snapshot(imgName, 0, 0, w-1, h-1, quality or 90); 
-	keepScreen(false);
-end 
---截取指定区域的图片  开发时使用
-function short_point_area_screen(imgName,x1,y1,x2,y2,quality)
-	keepScreen(true);
-	snapshot(imgName, x1, y1, x2, y2, quality or 90); 
-	keepScreen(false);
-end

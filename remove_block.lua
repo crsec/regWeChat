@@ -363,8 +363,8 @@ function get_moveblock_position()
 			return ps.slot[1],ps.slot[2]
         else
             toast("查找滑块位置失败",1);
-			mSleep(3000);
 			get_moveblock_position()
+			mSleep(3000);
         end
 end
 

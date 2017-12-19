@@ -1,43 +1,47 @@
-function isIPAvailable(IPforChecking)
-	local sz = require("sz");
-    local http = require("szocket.http");
-	local response_body = {};
-	local url = "http://119.23.142.95:7001/card-pool-api/ip";
-	local data = "{\"data\":" .. IPforChecking .. ",\"method\":\"add\"}";
-	require("TSLib");
-	local result = httpPost(url, data);
-	toast('获取IP中...',1)
-	if (type(result) ~= "string") then
-		return false;
-	end
-	local resultStr = result:base64_decode();
-	local resultTable = sz.json.decode(resultStr);
-	return resultTable.success;
-end
 
 
-
---请求检查IP地址是否可用
---1.可用，返回true和IP所属地区
---2.不可用，返回false重新开启关闭VPN
 function checkIPAvailable(baseUrl,IPforChecking)
 	local sz = require("sz");
     local http = require("szocket.http");
 	local response_body = {};
 	local url = baseUrl .. "/wc-register/ip-verify";
-	local data = "{\"ipAddress\":" .. IPforChecking .. "}";
-	--local data = "{\"ipAddress\":" .. IPforChecking .. ",\"method\":\"add\"}";
+	local data = "{\"ipAddress\":" .. "\"" .. IPforChecking .. "\"" .. "}";
+	local getData = {};
+	
 	require("TSLib");
+	
+	local successPost = false
 	for var= 1, 100 do
+		toast("checkIp...",1)
 		local result = httpPost(url, data);
-		toast(result.message,1)
-		if (result.returnCode == 100) then
-			return result.data
-			break
+		if (type(result) ~= "string") then
+			--return false;
+			toast("服务器异常，请检查...",1)
+			mSleep(4000)
 		else
-			mSleep(1000);
+			local resultTable = result:base64_decode();
+			local resultTable = sz.json.decode(resultTable);
+			if resultTable.returnCode == 100 then
+				toast(resultTable.message,1);
+				mSleep(1000)
+				successPost = true;
+				getData["recommend"] = resultTable.data.recommend;
+				getData["area"] = resultTable.data.area;
+				getData["location"] = resultTable.data.location;
+				break;
+			else
+				toast("检查IP错误！",2);
+				mSleep(3000);
+			end
 		end
 	end
-	toast("检测Ip接口报错...",2)
-	log_and_restart(logFileName, os.date("%Y-%m-%d %H:%M:%S") .. " " .. "该手机重试10次无效丢弃，冲去号注册");
+	--100次请求都没成功
+	if(successPost == false) then
+		log_and_exit('服务器异常，检查IP地址失败！');
+	end
+	return getData;
 end
+--checkDate = checkIPAvailable("http://112.74.48.131:9090","220.186.188.184");
+--toast(type(checkDate),1)
+
+
